@@ -1,0 +1,1 @@
+﻿<%@ ServiceHost Language="C#" Debug="true" Service="EbayFactory.EbayClient" CodeBehind="EbayFactory.svc.cs" %>

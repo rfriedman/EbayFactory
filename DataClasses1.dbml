@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?><Database Name="EbayFactory" Class="DataClasses1DataContext" xmlns="http://schemas.microsoft.com/linqtosql/dbml/2007">
+  <Connection Mode="WebSettings" ConnectionString="Data Source=RICHARD-HP\RICHARD;Initial Catalog=EbayFactory;User ID=sa" SettingsObjectName="System.Configuration.ConfigurationManager.ConnectionStrings" SettingsPropertyName="EbayFactoryConnectionString1" Provider="System.Data.SqlClient" />
+  <Table Name="dbo.tblCategories" Member="tblCategories">
+    <Type Name="tblCategory">
+      <Column Name="category_id" Type="System.String" DbType="NChar(10) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="category_level" Type="System.String" DbType="NChar(10)" CanBeNull="true" />
+      <Column Name="category_name" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="category_parent" Type="System.String" DbType="NChar(10)" CanBeNull="true" />
+      <Association Name="tblCategory_tblItem" Member="tblItems" ThisKey="category_id" OtherKey="item_category" Type="tblItem" />
+    </Type>
+  </Table>
+  <Table Name="dbo.tblItems" Member="tblItems">
+    <Type Name="tblItem">
+      <Column Name="item_id" Type="System.String" DbType="NChar(10) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="item_title" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="item_category" Type="System.String" DbType="NChar(10)" CanBeNull="true" />
+      <Column Name="listing_url" Type="System.String" DbType="nvarchar(300)" CanBeNull="true" />
+      <Column Name="gallery_url" Type="System.String" DbType="nvarchar(300)" CanBeNull="true" />
+      <Association Name="tblCategory_tblItem" Member="tblCategory" ThisKey="item_category" OtherKey="category_id" Type="tblCategory" IsForeignKey="true" />
+    </Type>
+  </Table>
+</Database>
