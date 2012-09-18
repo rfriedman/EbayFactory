@@ -23,6 +23,8 @@ namespace EbayFactory
             List<string> GetCategories();
             [OperationContract]
             List<tblItem> ItemByCategory(string cat);
+            [OperationContract]
+            void CreateSiteDataBase();
      
 
         // TODO: Add your service operations here

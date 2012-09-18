@@ -23,6 +23,7 @@ namespace EbayFactory
         private ApiContext m_api;
         DataClasses1DataContext db;
         tblCategory m_cats;
+
        // private ApiCredential m_user;
         /* Test site
         private static readonly string findingServerAddress = "http://svcs.sandbox.ebay.com/services/search/FindingService/v1";
@@ -44,6 +45,17 @@ namespace EbayFactory
             db = new DataClasses1DataContext();
                         
         }
+
+        public void CreateSiteDataBase()
+        {
+            DataClasses1DataContext context = new DataClasses1DataContext();
+            
+            if (false == context.DatabaseExists())
+            {
+                
+                context.CreateDatabase();
+            }
+        }
         public List<string> GetCategories()
         {
             DataClasses1DataContext context= new DataClasses1DataContext();
@@ -53,7 +65,7 @@ namespace EbayFactory
 
         public List<tblItem> ItemByCategory(string cat)
         {
-            DataClasses1DataContext context = new DataClasses1DataContext();
+            DataClasses1DataContext context = new DataClasses1DataContext();;
             var result = (from i in context.tblItems where i.item_category == cat select i);
 
             return result.ToList();
@@ -75,13 +87,14 @@ namespace EbayFactory
                 m_cats.category_level = category.CategoryLevel.ToString();
                 m_cats.category_name = category.CategoryName;
                 m_cats.category_parent = category.CategoryParentID[0].ToString();
-
+                DataClasses1DataContext db = new DataClasses1DataContext();
 
                 try
                 {
                     DataClasses1DataContext context = new DataClasses1DataContext();
                   //  context.Connection.ConnectionString = System.Configuration.ConfigurationManager.ConnectionStrings["EbayFactoryConnectionString"].ConnectionString;
                     context.tblCategories.InsertOnSubmit(m_cats);
+                    
                     context.SubmitChanges();
                 }
                 catch(Exception e)

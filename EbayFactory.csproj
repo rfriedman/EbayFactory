@@ -97,6 +97,7 @@
     <Folder Include="App_Data\" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="ClassDiagram1.cd" />
     <None Include="DataClasses1.dbml">
       <Generator>MSLinqToSQLGenerator</Generator>
       <LastGenOutput>DataClasses1.designer.cs</LastGenOutput>
@@ -123,7 +124,7 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>42031</DevelopmentServerPort>
+          <DevelopmentServerPort>22161</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>
           </IISUrl>
