@@ -14,12 +14,11 @@
         <elementListCompartment Id="c0cc91b9-e6a7-4ea5-97ae-5c40a953a850" absoluteBounds="3.515, 1.46, 1.9700000000000002, 1.2108968098958333" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
       </nestedChildShapes>
     </classShape>
-    <associationConnector edgePoints="[(2.75 : 1.72679768880208); (3.5 : 1.72679768880208)]" fixedFrom="Algorithm" fixedTo="Algorithm">
-      <AssociationMoniker Name="/DataClasses1DataContext/tblCategory/tblCategory_tblItem" />
-      <nodes>
-        <classShapeMoniker Id="f2512035-8343-475b-ba85-3a33d77d2eb3" />
-        <classShapeMoniker Id="a7a41773-a86c-4a47-af98-be1cdd8ffd2a" />
-      </nodes>
-    </associationConnector>
+    <classShape Id="3e473e3c-2b22-43a8-9025-b15d6a6d00f4" absoluteBounds="1.5, 3.625, 2, 1.1939925130208333">
+      <DataClassMoniker Name="/DataClasses1DataContext/cat_count" />
+      <nestedChildShapes>
+        <elementListCompartment Id="a5dca66c-6385-4bc0-80ba-8fc44de5f2fb" absoluteBounds="1.5150000000000001, 4.085, 1.9700000000000002, 0.63399251302083326" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
   </nestedChildShapes>
 </ordesignerObjectsDiagram>

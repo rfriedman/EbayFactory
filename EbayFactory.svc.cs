@@ -12,6 +12,9 @@ using eBay.Service.Core;
 using eBay.Services.Finding;
 using eBay.Services;
 using Samples.Helper;
+using System.Collections;
+using System.Security.Principal;
+using System.Web.Security;
 
 namespace EbayFactory
 {
@@ -56,21 +59,77 @@ namespace EbayFactory
                 context.CreateDatabase();
             }
         }
+        
         public List<string> GetCategories()
         {
             DataClasses1DataContext context= new DataClasses1DataContext();
             var result = from r in context.tblCategories select r.category_id;
             return result.ToList();
         }
+        //get categories from item table
+        //count number of occurances for each
+        //insert into table vaules category - category count
+        //return ordered list in decending order 
+        public void SetCategoryCount()
+        {
+            
+            DataClasses1DataContext context = new DataClasses1DataContext();
+            var result = from i in context.tblItems select i.item_category;
+            var d = result.Distinct();
+            foreach (string s in d)
+            {
+                
+                var cnt = context.tblItems.Count(p => p.item_category == s);
+                cat_count catcnt = new cat_count();
+
+                catcnt.category_id = s;
+                catcnt.category_count = cnt;
+
+
+                try
+                {
+                    context.cat_counts.DeleteOnSubmit(catcnt);
+                    context.SubmitChanges();
+                    context.cat_counts.InsertOnSubmit(catcnt);
+                    context.SubmitChanges();
+                }
+                catch (Exception e)
+                {
+                    string er = e.Message;
+                }
+            }    
+                        
+        }
+
+        public List<cat_count> GetCategoryCount()
+        {
+            DataClasses1DataContext context = new DataClasses1DataContext();
+
+            return context.cat_counts.ToList().OrderByDescending(cat_count => cat_count.category_count).ToList();
+
+        }
 
         public List<tblItem> ItemByCategory(string cat)
         {
             DataClasses1DataContext context = new DataClasses1DataContext();;
             var result = (from i in context.tblItems where i.item_category == cat select i);
-
+                                                                                                                            
             return result.ToList();
         }
 
+        public string TestConnection()
+        {
+            IIdentity currentUser = ServiceSecurityContext.Current.PrimaryIdentity;
+
+            if (Roles.IsUserInRole(currentUser.Name, "Member"))
+            {
+                DataClasses1DataContext context = new DataClasses1DataContext();
+
+                return string.Format(context.Connection.State + context.Connection.ToString());
+            }
+
+            return string.Format("fail");
+        }
 
         public void EbayTopLevelCategories()
         {
@@ -104,14 +163,76 @@ namespace EbayFactory
                 
 
             }
-    
-
             
             
         }
 
- 
-        
+        public List<tblItem> FindByKeyWord(String items)
+        {
+            List<tblItem> prodlist = new List<tblItem> { };
+            FindItemsAdvancedRequest request = new FindItemsAdvancedRequest();
+            //request.affiliate.trackingId = null;
+            //request.affiliate.networkId = "9";
+            // Set request parameters
+            request.keywords = items;
+            ItemFilter filter1 = new ItemFilter();
+            ItemFilter filter2 = new ItemFilter();
+            ItemFilter filter3 = new ItemFilter();
+            filter3.name = ItemFilterType.Condition;
+            filter3.value = new string[] { "1000" };
+
+            ItemFilter[] filters = { filter3/*, filter2, filter3*/ };
+
+            request.itemFilter = filters;
+            //request.categoryId = items;
+            if (request.keywords == null)
+            {
+                request.keywords = "ipod";
+            }
+            PaginationInput pi = new PaginationInput();
+            pi.entriesPerPage = 100;
+            pi.entriesPerPageSpecified = true;
+            request.paginationInput = pi;
+
+            // Call the service
+            FindItemsAdvancedResponse response = m_client.findItemsAdvanced(request);
+
+            SearchItem[] listing = response.searchResult.item;
+
+
+
+            if (listing != null)
+            {
+
+                foreach (SearchItem i in listing)
+                {
+                    tblItem items_tbl = new tblItem();
+                    items_tbl.item_category = i.primaryCategory.categoryId;
+                    items_tbl.item_title = i.title;
+                    items_tbl.item_id = i.itemId;
+                    items_tbl.gallery_url = i.galleryURL;
+                    items_tbl.listing_url = i.viewItemURL;
+
+                    prodlist.Add(items_tbl);
+                    try
+                    {
+                        DataClasses1DataContext context = new DataClasses1DataContext();
+                        context.tblItems.InsertOnSubmit(items_tbl);
+                        context.SubmitChanges();
+                    }
+                    catch (Exception e)
+                    {
+                        string s = e.Message;
+                    }
+
+                }
+
+                return prodlist;
+            }
+
+            return prodlist;
+        }
+
         public void FindByCategory(String[] items)
         {
             FindItemsAdvancedRequest request = new FindItemsAdvancedRequest();
@@ -147,6 +268,7 @@ namespace EbayFactory
 
             if (listing != null)
             {
+
                 foreach (SearchItem i in listing)
                 {
                     tblItem items_tbl = new tblItem();
@@ -155,7 +277,7 @@ namespace EbayFactory
                     items_tbl.item_id = i.itemId;
                     items_tbl.gallery_url = i.galleryURL;
                     items_tbl.listing_url = i.viewItemURL;
-                    
+
                     try
                     {
                         DataClasses1DataContext context = new DataClasses1DataContext();

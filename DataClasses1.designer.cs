@@ -36,6 +36,9 @@ namespace EbayFactory
     partial void InserttblItem(tblItem instance);
     partial void UpdatetblItem(tblItem instance);
     partial void DeletetblItem(tblItem instance);
+    partial void Insertcat_count(cat_count instance);
+    partial void Updatecat_count(cat_count instance);
+    partial void Deletecat_count(cat_count instance);
     #endregion
 		
 		public DataClasses1DataContext() : 
@@ -83,6 +86,14 @@ namespace EbayFactory
 				return this.GetTable<tblItem>();
 			}
 		}
+		
+		public System.Data.Linq.Table<cat_count> cat_counts
+		{
+			get
+			{
+				return this.GetTable<cat_count>();
+			}
+		}
 	}
 	
 	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.tblCategories")]
@@ -98,8 +109,6 @@ namespace EbayFactory
 		private string _category_name;
 		
 		private string _category_parent;
-		
-		private EntitySet<tblItem> _tblItems;
 		
     #region Extensibility Method Definitions
     partial void OnLoaded();
@@ -117,7 +126,6 @@ namespace EbayFactory
 		
 		public tblCategory()
 		{
-			this._tblItems = new EntitySet<tblItem>(new Action<tblItem>(this.attach_tblItems), new Action<tblItem>(this.detach_tblItems));
 			OnCreated();
 		}
 		
@@ -201,19 +209,6 @@ namespace EbayFactory
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="tblCategory_tblItem", Storage="_tblItems", ThisKey="category_id", OtherKey="item_category")]
-		public EntitySet<tblItem> tblItems
-		{
-			get
-			{
-				return this._tblItems;
-			}
-			set
-			{
-				this._tblItems.Assign(value);
-			}
-		}
-		
 		public event PropertyChangingEventHandler PropertyChanging;
 		
 		public event PropertyChangedEventHandler PropertyChanged;
@@ -233,18 +228,6 @@ namespace EbayFactory
 				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
 			}
 		}
-		
-		private void attach_tblItems(tblItem entity)
-		{
-			this.SendPropertyChanging();
-			entity.tblCategory = this;
-		}
-		
-		private void detach_tblItems(tblItem entity)
-		{
-			this.SendPropertyChanging();
-			entity.tblCategory = null;
-		}
 	}
 	
 	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.tblItems")]
@@ -262,8 +245,6 @@ namespace EbayFactory
 		private string _listing_url;
 		
 		private string _gallery_url;
-		
-		private EntityRef<tblCategory> _tblCategory;
 		
     #region Extensibility Method Definitions
     partial void OnLoaded();
@@ -283,7 +264,6 @@ namespace EbayFactory
 		
 		public tblItem()
 		{
-			this._tblCategory = default(EntityRef<tblCategory>);
 			OnCreated();
 		}
 		
@@ -338,10 +318,6 @@ namespace EbayFactory
 			{
 				if ((this._item_category != value))
 				{
-					if (this._tblCategory.HasLoadedOrAssignedValue)
-					{
-						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
-					}
 					this.Onitem_categoryChanging(value);
 					this.SendPropertyChanging();
 					this._item_category = value;
@@ -391,36 +367,88 @@ namespace EbayFactory
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="tblCategory_tblItem", Storage="_tblCategory", ThisKey="item_category", OtherKey="category_id", IsForeignKey=true)]
-		public tblCategory tblCategory
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.cat_count")]
+	public partial class cat_count : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private string _category_id;
+		
+		private System.Nullable<int> _category_count;
+		
+    #region Extensibility Method Definitions
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void Oncategory_idChanging(string value);
+    partial void Oncategory_idChanged();
+    partial void Oncategory_countChanging(System.Nullable<int> value);
+    partial void Oncategory_countChanged();
+    #endregion
+		
+		public cat_count()
+		{
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_category_id", DbType="NChar(10) NOT NULL", CanBeNull=false, IsPrimaryKey=true)]
+		public string category_id
 		{
 			get
 			{
-				return this._tblCategory.Entity;
+				return this._category_id;
 			}
 			set
 			{
-				tblCategory previousValue = this._tblCategory.Entity;
-				if (((previousValue != value) 
-							|| (this._tblCategory.HasLoadedOrAssignedValue == false)))
+				if ((this._category_id != value))
 				{
+					this.Oncategory_idChanging(value);
 					this.SendPropertyChanging();
-					if ((previousValue != null))
-					{
-						this._tblCategory.Entity = null;
-						previousValue.tblItems.Remove(this);
-					}
-					this._tblCategory.Entity = value;
-					if ((value != null))
-					{
-						value.tblItems.Add(this);
-						this._item_category = value.category_id;
-					}
-					else
-					{
-						this._item_category = default(string);
-					}
-					this.SendPropertyChanged("tblCategory");
+					this._category_id = value;
+					this.SendPropertyChanged("category_id");
+					this.Oncategory_idChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_category_count", DbType="Int")]
+		public System.Nullable<int> category_count
+		{
+			get
+			{
+				return this._category_count;
+			}
+			set
+			{
+				if ((this._category_count != value))
+				{
+					this.Oncategory_countChanging(value);
+					this.SendPropertyChanging();
+					this._category_count = value;
+					this.SendPropertyChanged("category_count");
+					this.Oncategory_countChanged();
 				}
 			}
 		}
