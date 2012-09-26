@@ -26,7 +26,7 @@ namespace EbayFactory
         private ApiContext m_api;
         DataClasses1DataContext db;
         tblCategory m_cats;
-
+        private List<string> m_log;
        // private ApiCredential m_user;
         /* Test site
         private static readonly string findingServerAddress = "http://svcs.sandbox.ebay.com/services/search/FindingService/v1";
@@ -46,9 +46,13 @@ namespace EbayFactory
             m_api = AppSettingHelper.GetApiContext();
             m_cats = new tblCategory();
             db = new DataClasses1DataContext();
-                        
+            m_log = new List<string> { };            
         }
 
+        public List<string> GetLog()
+        {
+            return m_log;
+        }
         public void CreateSiteDataBase()
         {
             DataClasses1DataContext context = new DataClasses1DataContext();
@@ -76,29 +80,53 @@ namespace EbayFactory
             DataClasses1DataContext context = new DataClasses1DataContext();
             var result = from i in context.tblItems select i.item_category;
             var d = result.Distinct();
+            List<string> dlist = d.ToList<string>();
             foreach (string s in d)
             {
-                
+                //update
+                var query= from update in context.cat_counts
+                           where update.category_id==s
+                           select update;
+                m_log.Add(query.ToString());
                 var cnt = context.tblItems.Count(p => p.item_category == s);
-                cat_count catcnt = new cat_count();
-
-                catcnt.category_id = s;
-                catcnt.category_count = cnt;
-
-
+                foreach(cat_count up in query)
+                {
+                    dlist.Remove(up.category_id);
+                    up.category_count = cnt;
+                }//update
+                
                 try
                 {
-                    context.cat_counts.DeleteOnSubmit(catcnt);
+
                     context.SubmitChanges();
+                    m_log.Add(context.Log.ToString());
+                }
+                catch (Exception e)
+                {
+                    string er = e.Message;
+                }
+            }
+            foreach (string s in dlist)
+            {             
+
+                var cnt = context.tblItems.Count(p => p.item_category == s);
+                cat_count catcnt = new cat_count();
+                
+                catcnt.category_id = s;
+                catcnt.category_count = cnt;
+                
+                try
+                {
                     context.cat_counts.InsertOnSubmit(catcnt);
                     context.SubmitChanges();
+                    m_log.Add(context.Log.ToString());
                 }
                 catch (Exception e)
                 {
                     string er = e.Message;
                 }
             }    
-                        
+
         }
 
         public List<cat_count> GetCategoryCount()
@@ -231,6 +259,32 @@ namespace EbayFactory
             }
 
             return prodlist;
+        }
+
+        public void DeleteTablesThenPopulate()
+        {
+            DataClasses1DataContext context = new DataClasses1DataContext();
+
+            List<tblItem> items= (from i in context.tblItems select i).ToList<tblItem>();
+            List<tblCategory> categories = (from i in context.tblCategories select i).ToList<tblCategory>();
+            
+            try
+            {
+                context.tblCategories.DeleteAllOnSubmit(categories);
+                context.tblItems.DeleteAllOnSubmit(items);
+                context.SubmitChanges();
+            }
+            catch (Exception e)
+            {
+                string er = e.ToString();
+            }
+
+            this.EbayTopLevelCategories();
+            List<string> cats = this.GetCategories();
+            for (int i = 0; i <= 30; i++)
+            {
+                this.FindByCategory(new string[] { cats[i] });
+            }
         }
 
         public void FindByCategory(String[] items)

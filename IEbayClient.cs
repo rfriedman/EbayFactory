@@ -29,7 +29,8 @@ namespace EbayFactory
             List<cat_count> GetCategoryCount();
             [OperationContract]
             List<tblItem> FindByKeyWord(String items);
-     
+            [OperationContract]
+            List<string> GetLog();
 
         // TODO: Add your service operations here
     }
@@ -46,6 +47,8 @@ namespace EbayFactory
             void CreateSiteDataBase();
             [OperationContract]
             void SetCategoryCount();
+            [OperationContract]
+            void DeleteTablesThenPopulate();
 
     }
 
